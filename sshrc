@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 function sshrc() {
     local SSHHOME=${SSHHOME:=~}
+    local SSHRC_REMOTETMPDIR=${SSHRC_REMOTETMPDIR:='/var/www/webdev/$USER'}
     if [ -f $SSHHOME/.sshrc ]; then
         local files=.sshrc
         if [ -d $SSHHOME/.sshrc.d ]; then
@@ -8,7 +9,7 @@ function sshrc() {
         fi
         ssh -t "$@" "
             if [ -e /etc/motd ]; then cat /etc/motd; fi
-            export SSHHOME=\$(mktemp -d -t .$(whoami).sshrc.XXXX)
+            export SSHHOME=\$(mktemp -d $SSHRC_REMOTETMPDIR/.$(whoami).sshrc.XXXX)
             export SSHRCCLEANUP=\$SSHHOME
             trap \"rm -rf \$SSHRCCLEANUP; exit\" 0
             echo $'"$(cat "$0" | xxd -p)"' | xxd -p -r > \$SSHHOME/sshrc
